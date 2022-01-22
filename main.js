@@ -38,21 +38,22 @@ function setup() {
   G.gameObjects.ground.pos = new Vector2(1280/2, 720-25);
   G.gameObjects.ground.size = new Vector2(1280, 50);
   G.gameObjects.ground.addComponent(new RectRenderer());
-  G.gameObjects.ground.components['RectRenderer'].fill = "green";
-  G.gameObjects.ground.components['RectRenderer'].stroke = "darkgreen";
+  G.gameObjects.ground.components.RectRenderer.fill = "green";
+  G.gameObjects.ground.components.RectRenderer.stroke = "darkgreen";
   G.gameObjects.ground.addComponent(new RectCollider());
-  G.gameObjects.ground.components['RectCollider'].size = new Vector2(1280, 50);;
+  G.gameObjects.ground.components.RectCollider.size = new Vector2(1280, 50);;
   G.gameObjects.ground.addTags('ground');
 
   G.gameObjects.player = new GameObject();
   G.gameObjects.player.pos = new Vector2(1280/3, 0);
   G.gameObjects.player.size = new Vector2(100, 100);
   G.gameObjects.player.addComponent(new RectRenderer());
-  G.gameObjects.player.components['RectRenderer'].fill = "darkblue";
-  G.gameObjects.player.components['RectRenderer'].stroke = "blue";
+  G.gameObjects.player.components.RectRenderer.fill = "darkblue";
+  G.gameObjects.player.components.RectRenderer.stroke = "blue";
   G.gameObjects.player.addComponent(new RectCollider());
-  G.gameObjects.player.components['RectCollider'].size = new Vector2(100, 100);
+  G.gameObjects.player.components.RectCollider.size = new Vector2(100, 100);
   G.gameObjects.player.addComponent(new Rigidbody());
+  G.gameObjects.player.components.Rigidbody.collisionableTags = ['ground'];
 }
 
 function main () {
