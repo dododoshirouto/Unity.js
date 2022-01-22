@@ -22,12 +22,15 @@ class GObject {
 
   addTags(tags) {
     if (typeof tags == 'string') tags = [tags];
-
+    this.tags = this.tags.concat(tags);
+    this.tags = Array.from(new Set(this.tags));
   }
 
   containsTags(tags) {
     if (typeof tags == 'string') tags = [tags];
-
+    tags = Array.from(new Set(tags));
+    let res = this.tags.filter(v=>tags.indexOf(v)>-1);
+    return res.length == tags.length;
   }
 }
 
