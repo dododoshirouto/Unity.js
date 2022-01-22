@@ -70,15 +70,36 @@ class Component extends GObject {
 }
 
 class Collider extends Component {
+  static colliders = [];
   isTrigger = false;
   constructor() {
     super();
+    Collider.colliders.push(this);
   }
 }
 
 class RectCollider extends Collider {
   constructor() {
     super();
+  }
+
+  overColliders(maskTags) {
+    let maskedCols = colliders.filter(v => { v.gameObject.containsTags(maskTags); });
+    return maskedCols.filter(v => {
+      let a = { pos: this.gameObject.pos, size: this.size };
+      let b = { pos: v.gameObject.pos, size: v.size };
+      if (Vector2.distance(a.pos, b.pos) >= (a.size.magnitude() + b.size.magnitude()) / 2) return false;
+      // a up b
+      if (a.pos.y + a.size.y / 2 < b.pos.y + b.size.y / 2) return false;
+      // a left b
+      if (a.pos.x + a.size.x / 2 < b.pos.x + b.size.x / 2) return false;
+      // a right b
+      if (a.pos.x - a.size.x / 2 > b.pos.x - b.size.x / 2) return false;
+      // a down b
+      if (a.pos.y - a.size.y / 2 > b.pos.y - b.size.y / 2) return false;
+
+      return true;
+    });
   }
 }
 
@@ -87,15 +108,36 @@ class RangeCollider extends Collider {
   constructor() {
     super();
   }
+
+  update() {
+    this.size.set(range*2, range*2);
+  }
+
+  overColliders(maskTags) {
+    let maskedCols = colliders.filter(v => { v.gameObject.containsTags(maskTags); });
+    return maskedCols.filter(v => {
+      let a = { pos: this.gameObject.pos, size: this.size };
+      let b = { pos: v.gameObject.pos, size: v.size };
+
+      if (Vector2.distance(a.pos, b.pos) >= (a.size.magnitude() + b.size.magnitude()) / 2) return false;
+
+      return true;
+    });
+  }
 }
 
 class Rigidbody extends Component {
+  vel = Vector2.zero;
+  useGravity = true;
+  collisionableTags = [];
+
   constructor() {
     super();
   }
 
   update() {
-
+    if (this.useGravity) this.vel.add( Vector2.up.mul(G.gravityPower) );
+    this.gameObject.pos.add( Vector2.mul(this.vel, 1/G.fps) );
   }
 }
 
@@ -105,18 +147,21 @@ class Renderer extends Component {
   stroke = "#0F06";
   img = "";
 
-  constructor(className) {
+  constructor() {
     super();
     this.elem = document.createElement('div');
-    // this.elem.classList.add('g-'+className);
     G.container.append(this.elem);
   }
 
   draw() {
-    this.elem.style.left = Math.round((this.gameObject.pos.x) * G.sscale);
-    this.elem.style.top = Math.round((this.gameObject.pos.y) * G.sscale);
+    this.elem.style.left = Math.round((this.gameObject.pos.x - this.gameObject.size.x / 2) * G.sscale);
+    this.elem.style.top = Math.round((this.gameObject.pos.y - this.gameObject.size.y / 2) * G.sscale);
     this.elem.style.width = Math.round((this.gameObject.size.x) * G.sscale);
     this.elem.style.height = Math.round((this.gameObject.size.y) * G.sscale);
+
+    this.elem.style.backgroundColor = this.fill;
+    this.elem.style.borderColor = this.stroke;
+    this.elem.style.borderWidth = '1px';
   }
 }
 

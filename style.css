@@ -2,9 +2,11 @@
   margin: 0;
   padding: 0;
   border-width: 0;
+  border-style: solid;
   outline-width: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+  image-rendering: pixelated;
 }
 
 html, body {
