@@ -35,7 +35,7 @@ class GObject {
 }
 
 class GameObject extends GObject {
-  static null = new GameObject();
+  static null = null;
   static gameObjects = [];
 
   name = "Game Object";
@@ -44,20 +44,20 @@ class GameObject extends GObject {
     super();
     GameObject.gameObjects.push(this);
   }
-  
+
   addComponent(component) {
     component.gameObject = this;
     return this.components[component.constructor.name] = component;
   }
 
   update() {
-    for (i in this.components) {
-      this.components[i].update();
+    for (const key in this.components) {
+      this.components[key].update();
     }
   }
   draw() {
-    for (i in this.components) {
-      this.components[i].draw();
+    for (const key in this.components) {
+      this.components[key].draw();
     }
   }
 }
@@ -121,7 +121,7 @@ class Renderer extends Component {
 }
 
 class RectRenderer extends Renderer {
-  
+
   constructor() {
     super();
   }
@@ -129,7 +129,7 @@ class RectRenderer extends Renderer {
 
 class RangeRenderer extends Renderer {
   range = 0;
-  
+
   constructor() {
     super();
   }
