@@ -2,8 +2,6 @@ class GObject {
   pos = Vector2.zero;
   size = Vector2.zero;
 
-  tags = [];
-
   constructor() {
 
   }
@@ -37,6 +35,8 @@ class GObject {
 class GameObject extends GObject {
   static null = null;
   static gameObjects = [];
+
+  tags = [];
 
   name = "Game Object";
   components = {};
@@ -75,6 +75,8 @@ class Collider extends Component {
   constructor() {
     super();
     Collider.colliders.push(this);
+
+    // this.size = this.gameObject.size;
   }
 }
 
@@ -84,29 +86,31 @@ class RectCollider extends Collider {
   }
 
   overColliders(maskTags) {
-    let maskedCols = colliders.filter(v => { v.gameObject.containsTags(maskTags); });
+    let maskedCols = Collider.colliders.filter(v => v.gameObject.containsTags(maskTags) );
     return maskedCols.filter(v => {
       let a = { pos: this.gameObject.pos, size: this.size };
       let b = { pos: v.gameObject.pos, size: v.size };
       if (Vector2.distance(a.pos, b.pos) >= (a.size.magnitude() + b.size.magnitude()) / 2) return false;
       // a up b
-      if (a.pos.y + a.size.y / 2 < b.pos.y + b.size.y / 2) return false;
+      if (a.pos.y + a.size.y / 2 < b.pos.y - b.size.y / 2) return false;
       // a left b
-      if (a.pos.x + a.size.x / 2 < b.pos.x + b.size.x / 2) return false;
+      if (a.pos.x + a.size.x / 2 < b.pos.x - b.size.x / 2) return false;
       // a right b
-      if (a.pos.x - a.size.x / 2 > b.pos.x - b.size.x / 2) return false;
+      if (a.pos.x - a.size.x / 2 > b.pos.x + b.size.x / 2) return false;
       // a down b
-      if (a.pos.y - a.size.y / 2 > b.pos.y - b.size.y / 2) return false;
+      if (a.pos.y - a.size.y / 2 > b.pos.y + b.size.y / 2) return false;
 
       return true;
     });
+    return maskTags;
   }
 }
 
 class RangeCollider extends Collider {
   range = 0;
-  constructor() {
+  constructor(range = 0) {
     super();
+    this.range = range;
   }
 
   update() {
@@ -114,7 +118,7 @@ class RangeCollider extends Collider {
   }
 
   overColliders(maskTags) {
-    let maskedCols = colliders.filter(v => { v.gameObject.containsTags(maskTags); });
+    let maskedCols = Collider.colliders.filter(v => v.gameObject.containsTags(maskTags));
     return maskedCols.filter(v => {
       let a = { pos: this.gameObject.pos, size: this.size };
       let b = { pos: v.gameObject.pos, size: v.size };
