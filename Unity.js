@@ -17,23 +17,9 @@ class GObject {
   destroy() {
 
   }
-
-  addTags(tags) {
-    if (typeof tags == 'string') tags = [tags];
-    this.tags = this.tags.concat(tags);
-    this.tags = Array.from(new Set(this.tags));
-  }
-
-  containsTags(tags) {
-    if (typeof tags == 'string') tags = [tags];
-    tags = Array.from(new Set(tags));
-    let res = this.tags.filter(v=>tags.indexOf(v)>-1);
-    return res.length == tags.length;
-  }
 }
 
 class GameObject extends GObject {
-  static null = null;
   static gameObjects = [];
 
   tags = [];
@@ -60,10 +46,22 @@ class GameObject extends GObject {
       this.components[key].draw();
     }
   }
+  
+  addTags(tags) {
+    if (typeof tags == 'string') tags = [tags];
+    this.tags = this.tags.concat(tags);
+    this.tags = Array.from(new Set(this.tags));
+  }
+  containsTags(tags) {
+    if (typeof tags == 'string') tags = [tags];
+    tags = Array.from(new Set(tags));
+    let res = this.tags.filter(v=>tags.indexOf(v)>-1);
+    return res.length == tags.length;
+  }
 }
 
 class Component extends GObject {
-  gameObject = GameObject.null;
+  gameObject = null;
   constructor() {
     super();
   }
@@ -120,6 +118,7 @@ class RectCollider extends Collider {
     let aa = { pos: a.gameObject.pos, size: a.size, vel: a.gameObject.components.Rigidbody.vel };
     let bb = { pos: b.gameObject.pos, size: b.size, vel: (isBRig ? b.gameObject.components.Rigidbody.vel : Vector2.zero) };
 
+/*
     if (aa.vel.x - bb.vel.x > 0) { // move to Right
       aa.pos.x += (bb.pos.x - bb.size.x / 2) - (aa.pos.x + aa.size.x / 2);
     } else if (aa.vel.x - bb.vel.x < 0) { // move to Left
@@ -130,14 +129,34 @@ class RectCollider extends Collider {
     } else if (aa.vel.y - bb.vel.y < 0) { // move to Up
       aa.pos.y += (bb.pos.y + bb.size.y / 2) - (aa.pos.y - aa.size.y / 2);
     }
+*/
+
+    let move = Vector2.zero;
+    if (aa.vel.x - bb.vel.x > 0) { // move to Right
+      move.x = (bb.pos.x - bb.size.x / 2) - (aa.pos.x + aa.size.x / 2);
+    } else  { // move to Left
+      move.x = (bb.pos.x + bb.size.x / 2) - (aa.pos.x - aa.size.x / 2);
+    }
+    if (aa.vel.y - bb.vel.y > 0) { // move to Down
+      move.y = (bb.pos.y - bb.size.y / 2) - (aa.pos.y + aa.size.y / 2);
+    } else { // move to Up
+      move.y = (bb.pos.y + bb.size.y / 2) - (aa.pos.y - aa.size.y / 2);
+    }
+    
+    if (Math.abs(move.x) < Math.abs(move.y)) {
+      move.y = Math.abs(move.x * aa.vel.y / aa.vel.x) * Math.sign(move.y);
+    } else {
+      move.x = Math.abs(move.y * aa.vel.x / aa.vel.y) * Math.sign(move.x);
+    }
+    
+    aa.pos.add(move);
 
     if (isBRig) {
       let averageVel = new Vector2( (aa.vel.x + bb.vel.x)/2, (aa.vel.y + bb.vel.y)/2 );
-      aa.vel = averageVel;
+      a.gameObject.components.Rigidbody.vel = averageVel;
       bb.vel = averageVel;
     } else {
-      aa.vel = Vector2.zero;
-      bb.vel = Vector2.zero;
+      a.gameObject.components.Rigidbody.vel = Vector2.zero;
     }
   }
 }
