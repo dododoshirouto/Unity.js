@@ -46,10 +46,16 @@ function uninput(ev) {
 }
 window.addEventListener('keydown', oninput, {passive:false});
 window.addEventListener('keyup', uninput, {passive:false});
+touchStart = null;
 function ontouch(ev) {
+  if (!touchStart) touchStart = new Vector2(ev.touches.screenX, ev.touches.screenY);
+  let nowTouch = new Vector2(ev.touches.screenX, ev.touches.screenY);
+  G.directionInput = Vector2.sub(nowTouch, touchStart);
   if (G.preventDefaultInput) ev.preventDefault();
 }
 function untouch(ev) {
+  
+  touchStart = null;
   if (G.preventDefaultInput) ev.preventDefault();
 }
 window.addEventListener('touchstart', ontouch, {passive:false});
