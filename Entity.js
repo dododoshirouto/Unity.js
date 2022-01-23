@@ -13,7 +13,7 @@ class Entity extends GameObject {
         super();
         this.addTags('entity');
 
-        this.pos = new Vector2(Math.random()*1280, 0);
+        this.pos = new Vector2(Math.random()*1280, Math.random()*200);
         this.size = new Vector2(100, 100);
 
         this.addComponent(new RectRenderer());

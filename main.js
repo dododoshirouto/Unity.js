@@ -11,6 +11,7 @@ G = {
   directionInput: Vector2.zero,
   inputSlipRate: 0.8,
   pressedKeys: {},
+  preventDefaultInput: false,
 };
 
 function init() {
@@ -37,21 +38,23 @@ window.addEventListener('orientationchange', resize);
 function oninput(ev) {
   // console.log(ev);
   G.pressedKeys[ev.code] = ev.type != 'keyup';
+  if (G.preventDefaultInput) ev.preventDefault();
 }
 function uninput(ev) {
   oninput(ev);
+  if (G.preventDefaultInput) ev.preventDefault();
 }
-window.addEventListener('keydown', oninput);
-window.addEventListener('keyup', uninput);
+window.addEventListener('keydown', oninput, {passive:false});
+window.addEventListener('keyup', uninput, {passive:false});
 function ontouch(ev) {
-
+  if (G.preventDefaultInput) ev.preventDefault();
 }
 function untouch(ev) {
-
+  if (G.preventDefaultInput) ev.preventDefault();
 }
-window.addEventListener('touchstart', oninput);
-window.addEventListener('touchmove', oninput);
-window.addEventListener('touchend', uninput);
+window.addEventListener('touchstart', ontouch, {passive:false});
+window.addEventListener('touchend', untouch, {passive:false});
+window.addEventListener('touchmove', ontouch, {passive:false});
 
 function inputToDirection() {
   let input = Vector2.zero;
