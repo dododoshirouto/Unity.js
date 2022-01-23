@@ -45,6 +45,10 @@ class Enemy extends Entity {
 
 class Player extends Entity {
 
+    moveSpeedX = 300;
+    jumpPower = 1000;
+
+    isJumpping = false;
 
     constructor() {
         super();
@@ -53,5 +57,13 @@ class Player extends Entity {
 
         this.components.RectRenderer.fill = "darkgreen";
         this.components.RectRenderer.stroke = "blue";
+    }
+
+    update() {
+        this.components.Rigidbody.vel.x = G.directionInput.x * 300;
+
+        if (G.pressedKeys.Space && this.components.Rigidbody.isCollision) this.components.Rigidbody.addForce(0, -1000);
+
+        super.update();
     }
 }
