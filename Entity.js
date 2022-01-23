@@ -57,6 +57,7 @@ class Player extends Entity {
 
         this.components.RectRenderer.fill = "darkgreen";
         this.components.RectRenderer.stroke = "blue";
+        this.components.RectRenderer.index = 500;
     }
 
     update() {

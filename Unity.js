@@ -214,6 +214,7 @@ class Renderer extends Component {
   fill = "#0000";
   stroke = "#0F06";
   img = "";
+  index = 0;
 
   constructor() {
     super();
@@ -230,6 +231,7 @@ class Renderer extends Component {
     this.elem.style.backgroundColor = this.fill;
     this.elem.style.borderColor = this.stroke;
     this.elem.style.borderWidth = '1px';
+    this.elem.style.zIndex = this.index;
   }
 }
 
