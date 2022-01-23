@@ -8,6 +8,9 @@ G = {
   fps: 30,
   gameObjects: {},
   gravityPower: 0.98 * 100,
+  directionInput: Vector2.zero,
+  inputSlipRate: 0.8,
+  pressedKeys: {},
 };
 
 function init() {
@@ -31,6 +34,39 @@ function resize() {
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
 
+function oninput(ev) {
+  // console.log(ev);
+  G.pressedKeys[ev.code] = ev.type != 'keyup';
+}
+function uninput(ev) {
+  oninput(ev);
+}
+window.addEventListener('keydown', oninput);
+window.addEventListener('keyup', uninput);
+function ontouch(ev) {
+
+}
+function untouch(ev) {
+
+}
+window.addEventListener('touchstart', oninput);
+window.addEventListener('touchmove', oninput);
+window.addEventListener('touchend', uninput);
+
+function inputToDirection() {
+  let input = Vector2.zero;
+  if (G.pressedKeys.KeyW) input.y += 1;
+  if (G.pressedKeys.KeyA) input.x -= 1;
+  if (G.pressedKeys.KeyS) input.y -= 1;
+  if (G.pressedKeys.KeyD) input.x += 1;
+  if (G.pressedKeys.ArrowUp) input.y += 1;
+  if (G.pressedKeys.ArrowLeft) input.x -= 1;
+  if (G.pressedKeys.ArrowDown) input.y -= 1;
+  if (G.pressedKeys.ArrowRight) input.x += 1;
+  input = Vector2.min(input, Vector2.one);
+  G.directionInput = Vector2.Lerp(G.directionInput, input, G.inputSlipRate);
+}
+
 
 
 function setup() {
@@ -53,6 +89,11 @@ function setup() {
 }
 
 function main () {
+
+  inputToDirection();
+
   GameObject.gameObjects.map(v=>v.update());
   GameObject.gameObjects.map(v=>v.draw());
+
+  // console.log(G.player.components.Rigidbody.isCollision);
 }
