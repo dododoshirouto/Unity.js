@@ -12,6 +12,7 @@ G = {
   inputSlipRate: 0.8,
   pressedKeys: {},
   preventDefaultInput: false,
+  touchMode: false,
 };
 
 function init() {
@@ -37,6 +38,7 @@ window.addEventListener('orientationchange', resize);
 
 function oninput(ev) {
   // console.log(ev);
+  G.touchMode = false;
   G.pressedKeys[ev.code] = ev.type != 'keyup';
   if (G.preventDefaultInput) ev.preventDefault();
 }
@@ -47,15 +49,23 @@ function uninput(ev) {
 window.addEventListener('keydown', oninput, {passive:false});
 window.addEventListener('keyup', uninput, {passive:false});
 touchStart = null;
+moveTouchIdentifier = null;
 function ontouch(ev) {
-  if (!touchStart) touchStart = new Vector2(ev.touches.screenX, ev.touches.screenY);
-  let nowTouch = new Vector2(ev.touches.screenX, ev.touches.screenY);
-  G.directionInput = Vector2.sub(nowTouch, touchStart);
+  G.touchMode = true;
+  if (!touchStart) {
+    touchStart = new Vector2(ev.touches[0].screenX, ev.touches[0].screenY);
+    moveTouchIdentifier = ev.touches[0].identifier;
+  }
+  let nowTouch = new Vector2(ev.touches[0].screenX, ev.touches[0].screenY);
+  G.directionInput = Vector2.sub(nowTouch, touchStart).mul(0.03).clampMagnitude(1);
+  console.log(G.directionInput);
   if (G.preventDefaultInput) ev.preventDefault();
 }
 function untouch(ev) {
-  
-  touchStart = null;
+  if (ev.changedTouches[0].identifier == moveTouchIdentifier) {
+    G.directionInput = Vector2.zero;
+    touchStart = null;
+  }
   if (G.preventDefaultInput) ev.preventDefault();
 }
 window.addEventListener('touchstart', ontouch, {passive:false});
@@ -72,7 +82,6 @@ function inputToDirection() {
   if (G.pressedKeys.ArrowLeft) input.x -= 1;
   if (G.pressedKeys.ArrowDown) input.y -= 1;
   if (G.pressedKeys.ArrowRight) input.x += 1;
-  input = Vector2.min(input, Vector2.one);
   G.directionInput = Vector2.Lerp(G.directionInput, input, G.inputSlipRate);
 }
 
@@ -99,10 +108,11 @@ function setup() {
 
 function main () {
 
-  inputToDirection();
+  if (!G.touchMode) inputToDirection();
 
   GameObject.gameObjects.map(v=>v.update());
   GameObject.gameObjects.map(v=>v.draw());
 
   // console.log(G.player.components.Rigidbody.isCollision);
+  // console.log(G.directionInput);
 }
