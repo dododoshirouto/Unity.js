@@ -84,7 +84,7 @@ function setup() {
 
   G.enemy = [];
   for(let i=0; i<3; i++) {
-    // G.enemy[i] = new Enemy();
+    G.enemy[i] = new Enemy();
   }
 }
 

@@ -73,8 +73,6 @@ class Collider extends Component {
   constructor() {
     super();
     Collider.colliders.push(this);
-
-    // this.size = this.gameObject.size;
   }
 
   isCollision(other) { return false; }
@@ -110,8 +108,6 @@ class RectCollider extends Collider {
 
   moveOnCollision(other) {
     if (other == this) return;
-    // let a = ('RigidBody' in this.gameObject.components ? this : other);
-    // let b = (a == this ? other : this);
     let a = this;
     let b = other;
     let isBRig = 'Rigidbody' in b.gameObject.components;
@@ -131,7 +127,6 @@ class RectCollider extends Collider {
     }
 
     if (Math.abs(move.x) < Math.abs(move.y)) {
-      // move.y = Math.abs(move.x * aa.vel.y / aa.vel.x) * Math.sign(move.y);
       move.y = 0;
 
       if (isBRig) {
@@ -141,7 +136,6 @@ class RectCollider extends Collider {
         a.gameObject.components.Rigidbody.vel.x = 0;
       }
     } else {
-      // move.x = Math.abs(move.y * aa.vel.x / aa.vel.y) * Math.sign(move.x);
       move.x = 0;
 
       if (isBRig) {
@@ -153,16 +147,6 @@ class RectCollider extends Collider {
     }
 
     aa.pos.add(move);
-
-/*
-    if (isBRig) {
-      let averageVel = new Vector2( (aa.vel.x + bb.vel.x)/2, (aa.vel.y + bb.vel.y)/2 );
-      a.gameObject.components.Rigidbody.vel = averageVel;
-      b.gameObject.components.Rigidbody.vel = averageVel;
-    } else {
-      a.gameObject.components.Rigidbody.vel = Vector2.zero;
-    }
-*/
   }
 }
 
