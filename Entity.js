@@ -15,12 +15,12 @@ class Entity extends GameObject {
 
     this.size = new Vector2(60, 60);
 
-    this.addComponent(new RectRenderer());
+    this.addComponent(new RectRenderer(this));
 
-    this.addComponent(new RectCollider());
+    this.addComponent(new RectCollider(this));
     this.components.RectCollider.size = new Vector2(60, 60);
 
-    this.addComponent(new Rigidbody());
+    this.addComponent(new Rigidbody(this));
     this.components.Rigidbody.collisionableTags = ['ground'];
   }
 }
@@ -59,8 +59,8 @@ class Player extends Entity {
     this.components.RectRenderer.fill = "darkgreen";
     this.components.RectRenderer.stroke = "blue";
     this.components.RectRenderer.index = 500;
-    
-    this.addComponent(new RangeCollider(), 'atkRange');
+
+    this.addComponent(new RangeCollider(this), 'atkRange');
     this.components.atkRange.range = 100;
   }
 

@@ -62,16 +62,18 @@ class GameObject extends GObject {
 
 class Component extends GObject {
   gameObject = null;
-  constructor() {
+  constructor(gameObject) {
     super();
+    if (gameObject==null) console.error('gameObject が指定されていません');
+    this.gameObject = gameObject;
   }
 }
 
 class Collider extends Component {
   static colliders = [];
   isTrigger = false;
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
     Collider.colliders.push(this);
   }
 
@@ -86,8 +88,8 @@ class Collider extends Component {
 }
 
 class RectCollider extends Collider {
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
   }
 
   isCollision(other) {
@@ -153,19 +155,18 @@ class RectCollider extends Collider {
 class RangeCollider extends Collider {
   range = 0;
   debugRenderer = null;
-  constructor(range = 0) {
-    super();
+  constructor(gameObject, range = 0) {
+    super(gameObject);
     this.range = range;
-    this.debugRenderer = new RangeRenderer();
-    this.debugRenderer.gameObject = this.gameObject;
+    this.debugRenderer = new RangeRenderer(this.gameObject);
     this.debugRenderer.range = this.range;
   }
 
   update() {
-    this.size.set(range*2, range*2);
   }
-  
+
   draw() {
+    this.size.set(this.range * 2, this.range * 2);
     this.debugRenderer.draw();
   }
 
@@ -188,8 +189,8 @@ class Rigidbody extends Component {
 
   isCollision = false;
 
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
   }
 
   update() {
@@ -224,8 +225,8 @@ class Renderer extends Component {
   img = "";
   index = 0;
 
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
     this.elem = document.createElement('div');
     G.container.append(this.elem);
   }
@@ -245,27 +246,27 @@ class Renderer extends Component {
 
 class RectRenderer extends Renderer {
 
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
   }
 }
 
 class RangeRenderer extends Renderer {
   range = 0;
 
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
   }
 
   draw() {
     this.size = Vector2.one.mul(this.range);
     super.draw();
-    this.elem.style.borderRadius = '100maxv';
+    this.elem.style.borderRadius = '100vmax';
   }
 }
 
 class Camera extends Component {
-  constructor() {
-    super();
+  constructor(gameObject) {
+    super(gameObject);
   }
 }

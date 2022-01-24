@@ -93,10 +93,10 @@ function setup() {
   G.gameObjects.ground = new GameObject();
   G.gameObjects.ground.pos = new Vector2(1280/2, 720-25);
   G.gameObjects.ground.size = new Vector2(1280, 50);
-  G.gameObjects.ground.addComponent(new RectRenderer());
+  G.gameObjects.ground.addComponent(new RectRenderer(G.gameObjects.ground));
   G.gameObjects.ground.components.RectRenderer.fill = "green";
   G.gameObjects.ground.components.RectRenderer.stroke = "darkgreen";
-  G.gameObjects.ground.addComponent(new RectCollider());
+  G.gameObjects.ground.addComponent(new RectCollider(G.gameObjects.ground));
   G.gameObjects.ground.components.RectCollider.size = new Vector2(1280, 50);;
   G.gameObjects.ground.addTags('ground');
 
