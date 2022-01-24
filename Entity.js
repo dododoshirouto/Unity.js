@@ -16,6 +16,7 @@ class Entity extends GameObject {
     this.size = new Vector2(60, 60);
 
     this.addComponent(new RectRenderer(this));
+    this.components.RectRenderer.size = new Vector2(60, 60);
 
     this.addComponent(new RectCollider(this));
     this.components.RectCollider.size = new Vector2(60, 60);

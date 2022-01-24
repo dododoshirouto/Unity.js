@@ -96,6 +96,7 @@ function setup() {
   G.gameObjects.ground.addComponent(new RectRenderer(G.gameObjects.ground));
   G.gameObjects.ground.components.RectRenderer.fill = "green";
   G.gameObjects.ground.components.RectRenderer.stroke = "darkgreen";
+  G.gameObjects.ground.components.RectRenderer.size = new Vector2(1280, 50);
   G.gameObjects.ground.addComponent(new RectCollider(G.gameObjects.ground));
   G.gameObjects.ground.components.RectCollider.size = new Vector2(1280, 50);;
   G.gameObjects.ground.addTags('ground');

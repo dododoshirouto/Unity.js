@@ -93,8 +93,8 @@ class RectCollider extends Collider {
   }
 
   isCollision(other) {
-    let a = { pos: this.gameObject.pos, size: this.size };
-    let b = { pos: other.gameObject.pos, size: other.size };
+    let a = { pos: Vector2.add(this.gameObject.pos, this.pos), size: this.size };
+    let b = { pos: Vector2.add(other.gameObject.pos, other.pos), size: other.size };
     if (Vector2.distance(a.pos, b.pos) >= (a.size.magnitude() + b.size.magnitude()) / 2) return false;
     // a up b
     if (a.pos.y + a.size.y / 2 < b.pos.y - b.size.y / 2) return false;
@@ -113,8 +113,8 @@ class RectCollider extends Collider {
     let a = this;
     let b = other;
     let isBRig = 'Rigidbody' in b.gameObject.components;
-    let aa = { pos: a.gameObject.pos, size: a.size, vel: a.gameObject.components.Rigidbody.vel };
-    let bb = { pos: b.gameObject.pos, size: b.size, vel: (isBRig ? b.gameObject.components.Rigidbody.vel : Vector2.zero) };
+    let aa = { pos: Vector2.add(a.gameObject.pos, a.pos), size: a.size, vel: a.gameObject.components.Rigidbody.vel };
+    let bb = { pos: Vector2.add(a.gameObject.pos, a.pos), size: b.size, vel: (isBRig ? b.gameObject.components.Rigidbody.vel : Vector2.zero) };
 
     let move = Vector2.zero;
     if (aa.vel.x - bb.vel.x > 0) { // move to Right
@@ -148,7 +148,7 @@ class RectCollider extends Collider {
       }
     }
 
-    aa.pos.add(move);
+    a.gameObject.pos.add(move);
   }
 }
 
@@ -171,8 +171,8 @@ class RangeCollider extends Collider {
   }
 
   isCollision(other) {
-    let a = { pos: this.gameObject.pos, size: this.size };
-    let b = { pos: other.gameObject.pos, size: other.size };
+    let a = { pos: Vector2.add(this.gameObject.pos, this.pos), size: this.size };
+    let b = { pos: Vector2.add(other.gameObject.pos, other.pos), size: other.size };
 
     if (Vector2.distance(a.pos, b.pos) >= (a.size.magnitude() + b.size.magnitude()) / 2) return false;
 
@@ -214,7 +214,7 @@ class Rigidbody extends Component {
     if (typeof x == 'number') x = new Vector2(x, y);
 
     this.vel.add(x);
-    this.gameObject.pos.add(Vector2.mul(this.vel, 1 / G.fps));
+    // this.gameObject.pos.add(Vector2.mul(this.vel, 1 / G.fps));
   }
 }
 
@@ -232,10 +232,10 @@ class Renderer extends Component {
   }
 
   draw() {
-    this.elem.style.left = Math.round((this.gameObject.pos.x - this.gameObject.size.x / 2) * G.sscale);
-    this.elem.style.top = Math.round((this.gameObject.pos.y - this.gameObject.size.y / 2) * G.sscale);
-    this.elem.style.width = Math.round((this.gameObject.size.x) * G.sscale);
-    this.elem.style.height = Math.round((this.gameObject.size.y) * G.sscale);
+    this.elem.style.left = Math.round((this.gameObject.pos.x+this.pos.x - this.size.x / 2) * G.sscale);
+    this.elem.style.top = Math.round((this.gameObject.pos.y + this.pos.y - this.size.y / 2) * G.sscale);
+    this.elem.style.width = Math.round((this.size.x) * G.sscale);
+    this.elem.style.height = Math.round((this.size.y) * G.sscale);
 
     this.elem.style.backgroundColor = this.fill;
     this.elem.style.borderColor = this.stroke;
