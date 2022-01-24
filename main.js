@@ -9,6 +9,7 @@ G = {
   gameObjects: {},
   gravityPower: 0.98 * 100,
   directionInput: Vector2.zero,
+  touchCount: 0,
   inputSlipRate: 0.8,
   pressedKeys: {},
   preventDefaultInput: false,
@@ -58,7 +59,7 @@ function ontouch(ev) {
   }
   let nowTouch = new Vector2(ev.touches[0].screenX, ev.touches[0].screenY);
   G.directionInput = Vector2.sub(nowTouch, touchStart).mul(0.03).clampMagnitude(1);
-  console.log(G.directionInput);
+  G.touchCount = ev.touches.length;
   if (G.preventDefaultInput) ev.preventDefault();
 }
 function untouch(ev) {
@@ -66,6 +67,7 @@ function untouch(ev) {
     G.directionInput = Vector2.zero;
     touchStart = null;
   }
+  G.touchCount = ev.touches.length;
   if (G.preventDefaultInput) ev.preventDefault();
 }
 window.addEventListener('touchstart', ontouch, {passive:false});

@@ -31,9 +31,9 @@ class GameObject extends GObject {
     GameObject.gameObjects.push(this);
   }
 
-  addComponent(component) {
+  addComponent(component, name=component.constructor.name) {
     component.gameObject = this;
-    return this.components[component.constructor.name] = component;
+    return this.components[name] = component;
   }
 
   update() {
@@ -152,13 +152,21 @@ class RectCollider extends Collider {
 
 class RangeCollider extends Collider {
   range = 0;
+  debugRenderer = null;
   constructor(range = 0) {
     super();
     this.range = range;
+    this.debugRenderer = new RangeRenderer();
+    this.debugRenderer.gameObject = this.gameObject;
+    this.debugRenderer.range = this.range;
   }
 
   update() {
     this.size.set(range*2, range*2);
+  }
+  
+  draw() {
+    this.debugRenderer.draw();
   }
 
   isCollision(other) {
@@ -211,7 +219,7 @@ class Rigidbody extends Component {
 
 class Renderer extends Component {
   elem = null;
-  fill = "#0000";
+  fill = "#0F03";
   stroke = "#0F06";
   img = "";
   index = 0;
