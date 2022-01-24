@@ -114,7 +114,7 @@ class RectCollider extends Collider {
     let b = other;
     let isBRig = 'Rigidbody' in b.gameObject.components;
     let aa = { pos: Vector2.add(a.gameObject.pos, a.pos), size: a.size, vel: a.gameObject.components.Rigidbody.vel };
-    let bb = { pos: Vector2.add(a.gameObject.pos, a.pos), size: b.size, vel: (isBRig ? b.gameObject.components.Rigidbody.vel : Vector2.zero) };
+    let bb = { pos: Vector2.add(b.gameObject.pos, b.pos), size: b.size, vel: (isBRig ? b.gameObject.components.Rigidbody.vel : Vector2.zero) };
 
     let move = Vector2.zero;
     if (aa.vel.x - bb.vel.x > 0) { // move to Right
