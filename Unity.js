@@ -1,6 +1,7 @@
 class GObject {
   pos = Vector2.zero;
   size = Vector2.zero;
+  index = 0;
 
   constructor() {
 
@@ -129,23 +130,25 @@ class RectCollider extends Collider {
     }
 
     if (Math.abs(move.x) < Math.abs(move.y)) {
-      move.y = 0;
 
+      move.y = 0;
       if (isBRig) {
         a.gameObject.components.Rigidbody.vel.x = (aa.vel.x + bb.vel.x) / 2;
         b.gameObject.components.Rigidbody.vel.x = (aa.vel.x + bb.vel.x) / 2;
       } else {
         a.gameObject.components.Rigidbody.vel.x = 0;
       }
-    } else {
-      move.x = 0;
 
+    } else {
+
+      move.x = 0;
       if (isBRig) {
         a.gameObject.components.Rigidbody.vel.y = (aa.vel.y + bb.vel.y) / 2;
         b.gameObject.components.Rigidbody.vel.y = (aa.vel.y + bb.vel.y) / 2;
       } else {
         a.gameObject.components.Rigidbody.vel.y = 0;
       }
+
     }
 
     a.gameObject.pos.add(move);
@@ -163,9 +166,11 @@ class RangeCollider extends Collider {
   }
 
   update() {
+
   }
 
   draw() {
+    this.debugRenderer.range = this.range;
     this.size.set(this.range * 2, this.range * 2);
     this.debugRenderer.draw();
   }
@@ -220,10 +225,9 @@ class Rigidbody extends Component {
 
 class Renderer extends Component {
   elem = null;
-  fill = "#0F03";
-  stroke = "#0F06";
+  fill = "#0F01";
+  stroke = "#0F02";
   img = "";
-  index = 0;
 
   constructor(gameObject) {
     super(gameObject);
@@ -240,7 +244,7 @@ class Renderer extends Component {
     this.elem.style.backgroundColor = this.fill;
     this.elem.style.borderColor = this.stroke;
     this.elem.style.borderWidth = '1px';
-    this.elem.style.zIndex = this.index;
+    this.elem.style.zIndex = this.index + this.gameObject.index;
   }
 }
 
@@ -259,7 +263,7 @@ class RangeRenderer extends Renderer {
   }
 
   draw() {
-    this.size = Vector2.one.mul(this.range);
+    this.size.set(this.range * 2, this.range * 2)
     super.draw();
     this.elem.style.borderRadius = '100vmax';
   }

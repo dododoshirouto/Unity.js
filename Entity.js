@@ -2,7 +2,7 @@ class Entity extends GameObject {
 
   hp = 0;
   attack = 0;
-  atkRange = 0;
+  atkRange = null;
   moveRange = 0;
   defence = 0;
 
@@ -59,7 +59,7 @@ class Player extends Entity {
 
     this.components.RectRenderer.fill = "darkgreen";
     this.components.RectRenderer.stroke = "blue";
-    this.components.RectRenderer.index = 500;
+    this.index = 500;
 
     this.addComponent(new RangeCollider(this), 'atkRange');
     this.components.atkRange.range = 100;
