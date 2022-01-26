@@ -97,7 +97,7 @@ class Collider extends Component {
 
   overColliders(maskTags) {
     let maskedCols = Collider.colliders.filter(v => v.gameObject.containsTags(maskTags));
-    return maskedCols.filter(v => this.isCollision(v));
+    return maskedCols.filter(v => this.isCollision(v)).sort((a,b)=>{return Vector2.distance(this.gameObject.pos + this.pos, a.gameObject.pos + a.pos) - Vector2.distance(this.gameObject.pos + this.pos, b.gameObject.pos + b.pos)});
   }
 
   moveOnCollision(other) {}
@@ -191,7 +191,7 @@ class RangeCollider extends Collider {
 
   draw() {
     this.debugRenderer.range = this.range;
-    this.size.set(this.range * 2, this.range * 2);
+    this.size.set(this.range * 2 * Math.sin(Math.PI / 4), this.range * 2 * Math.sin(Math.PI / 4));
     this.debugRenderer.draw();
   }
 

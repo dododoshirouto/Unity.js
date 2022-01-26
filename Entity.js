@@ -1,6 +1,6 @@
 class Entity extends GameObject {
 
-  hp = 0;
+  hp = 100;
   attack = 0;
   atkRange = null;
   moveRange = 0;
@@ -8,6 +8,9 @@ class Entity extends GameObject {
 
   moveTarget = null;
   atkTarget = null;
+
+  atkRange = new MinMax(30, 30);
+  atkAge = 0;
 
   constructor() {
     super();
@@ -23,6 +26,18 @@ class Entity extends GameObject {
 
     this.addComponent(new Rigidbody(this));
     this.components.Rigidbody.collisionableTags = ['ground'];
+  }
+
+  update() {
+    super.update();
+    this.atkAge--;
+  }
+
+  damage(damage) {
+    this.hp = Math.max(this.hp - damage, 0);
+    if (this.hp == 0) {
+      this.destroy();
+    }
   }
 }
 
@@ -76,11 +91,21 @@ class Player extends Entity {
   }
 
   update() {
+    super.update();
+
     this.components.Rigidbody.vel.x = G.directionInput.x * 200;
 
     if ((G.pressedKeys.Space || G.touchCount >= 2) && this.components.Rigidbody.isCollision) this.components.Rigidbody.addForce(0, -1000);
 
-    super.update();
+    if (this.atkAge <= 0) {
+      let attakableEnemys = this.components.atkRange.overColliders(['enemy']);
+      if (attakableEnemys.length > 0) {
+        let atk = new Attack(this);
+        atk.attackTags = ['enemy'];
+        atk.pos = attakableEnemys[0].gameObject.pos;
+        this.atkAge = this.atkRange.random();
+      }
+    }
   }
 
   destroy() {
@@ -96,14 +121,34 @@ class Attack extends GameObject{
 
   attackedEnemysCount = 1;
   maxLifeFrame = 1;
-  damage = new MinMax(1, 1);
+  damage = new MinMax(10, 10);
+
+  lifeFrame = 0;
+  attackCount = 0;
 
   attackTags = [];
 
   constructor(ownerGameObject) {
+    super();
     if (ownerGameObject == null) console.error('攻撃のオーナーが指定されていません');
     this.ownerGameObject = ownerGameObject;
+
+    this.addComponent(new RangeCollider(this));
+    this.components.RangeCollider.range = 20;
+    this.components.RangeCollider.debugRenderer.fill = '#f003';
+    this.components.RangeCollider.debugRenderer.stroke = '#f001';
+
+    this.index = 1000;
   }
 
-
+  update() {
+    let overColliders = this.components.RangeCollider.overColliders(this.attackTags);
+    for (const col of overColliders) {
+      col.gameObject.damage(this.damage.random());
+      this.attackCount++;
+      if (this.attackCount >= this,this.attackedEnemysCount) break;
+    }
+    this.lifeFrame++;
+    if (this.lifeFrame >= this.maxLifeFrame) this.destroy();
+  }
 }
