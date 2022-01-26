@@ -55,6 +55,9 @@ Math.normalizedRandom = function(normalize=3) {
     rnd /= Math.abs(normalize);
     return (normalize<0? Math.ceil(rnd*2)/2 - rnd + Math.floor(rnd*2)/2: rnd);
 }
+Math.average = function(...a) {
+  return a.reduce((s,v)=>s+v, 0) / Math.max(a.length, 1);
+}
 // Math.closestPowerOfTwo(val) {}
 
 Math.deg2rad = Math.PI / 180;
@@ -256,6 +259,34 @@ function execCopy(string) {
     document.getSelection().selectAllChildren(tmp);
     document.execCommand("copy");
     document.body.removeChild(tmp);
+}
+
+
+
+
+class MinMax {
+  _min = 0;
+  _max = 0;
+  
+  get min() {return this._min;}
+  set min(v) {
+    this._min = Math.min(v, this._max);
+    this._max = Math.max(v, this._max);
+  }
+  get max() {return this._max;}
+  set max(v) {
+    this._max = Math.max(v, this._min);
+    this._min = Math.min(v, this._min);
+  }
+  
+  constructor(min=0, max=0) {
+    this._min = Math.min(min, max);
+    this._max = Math.max(min, max);
+  }
+  
+  random() {
+    return Math.lerp(this._min, this._max, Math.random());
+  }
 }
 
 

@@ -73,3 +73,22 @@ class Player extends Entity {
     super.update();
   }
 }
+
+
+
+class Attack extends GameObject{
+  ownerGameObject = null;
+  
+  attackedEnemysCount = 1;
+  maxLifeFrame = 1;
+  damage = new MinMax(1, 1);
+  
+  attackTags = [];
+  
+  constructor(ownerGameObject) {
+    if (ownerGameObject == null) console.error('攻撃のオーナーが指定されていません');
+    this.ownerGameObject = ownerGameObject;
+  }
+  
+  
+}

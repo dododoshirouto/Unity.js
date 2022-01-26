@@ -59,6 +59,13 @@ class GameObject extends GObject {
     let res = this.tags.filter(v=>tags.indexOf(v)>-1);
     return res.length == tags.length;
   }
+  
+  destroy() {
+    for (const key in this.components) {
+      this.components[key].destroy();
+    }
+    GameObject.gameObjects = GameObject.gameObjects.filter(v=>v!=this);
+  }
 }
 
 class Component extends GObject {
@@ -67,6 +74,12 @@ class Component extends GObject {
     super();
     if (gameObject==null) console.error('gameObject が指定されていません');
     this.gameObject = gameObject;
+  }
+  
+  destroy() {
+    // TODO: 自分のキー名を取得する。
+    let name = '';
+    delete this.gameObject.components.name;
   }
 }
 
@@ -86,6 +99,11 @@ class Collider extends Component {
   }
 
   moveOnCollision(other) {}
+  
+  destroy() {
+    super.destroy();
+    Collider.colliders = Collider.colliders.filtr(v=>v!=this);
+  }
 }
 
 class RectCollider extends Collider {
