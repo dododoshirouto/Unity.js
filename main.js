@@ -101,11 +101,11 @@ function setup() {
   G.gameObjects.ground.components.RectCollider.size = new Vector2(1280, 50);;
   G.gameObjects.ground.addTags('ground');
 
-  G.player = new Player();
+  new Player();
 
   G.enemy = [];
   for(let i=0; i<3; i++) {
-    G.enemy[i] = new Enemy();
+    new Enemy();
   }
 }
 

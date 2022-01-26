@@ -59,7 +59,7 @@ class GameObject extends GObject {
     let res = this.tags.filter(v=>tags.indexOf(v)>-1);
     return res.length == tags.length;
   }
-  
+
   destroy() {
     for (const key in this.components) {
       this.components[key].destroy();
@@ -75,10 +75,12 @@ class Component extends GObject {
     if (gameObject==null) console.error('gameObject が指定されていません');
     this.gameObject = gameObject;
   }
-  
+
   destroy() {
-    // TODO: 自分のキー名を取得する。
     let name = '';
+    for (const key in this.gameObject.components) {
+      if (this.gameObject.components[key] == this) { name = key; break; }
+    }
     delete this.gameObject.components.name;
   }
 }
@@ -99,10 +101,10 @@ class Collider extends Component {
   }
 
   moveOnCollision(other) {}
-  
+
   destroy() {
+    Collider.colliders = Collider.colliders.filter(v=>v!=this);
     super.destroy();
-    Collider.colliders = Collider.colliders.filtr(v=>v!=this);
   }
 }
 
@@ -201,6 +203,11 @@ class RangeCollider extends Collider {
 
     return true;
   }
+
+  destroy() {
+    this.debugRenderer.destroy();
+    super.destroy();
+  }
 }
 
 class Rigidbody extends Component {
@@ -263,6 +270,11 @@ class Renderer extends Component {
     this.elem.style.borderColor = this.stroke;
     this.elem.style.borderWidth = '1px';
     this.elem.style.zIndex = this.index + this.gameObject.index;
+  }
+
+  destroy() {
+    this.elem.remove();
+    super.destroy();
   }
 }
 

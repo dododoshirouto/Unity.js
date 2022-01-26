@@ -33,12 +33,20 @@ class Enemy extends Entity {
 
   constructor() {
     super();
+    if (!G.enemy) G.enemy = [];
+    G.enemy.push(this);
+
     this.pos = new Vector2(Math.random() * 1000+280, Math.random() * 200);
 
     this.addTags('enemy');
 
     this.components.RectRenderer.fill = ['darkblue', 'darkgoldenrod', 'darkred', 'darkcyan', 'darkmagenta'][Math.floor(Math.random() * 5)];
     this.components.RectRenderer.stroke = "red";
+  }
+
+  destroy() {
+    super.destroy();
+    G.enemy = G.enemy.filter(v=>v!=this);
   }
 }
 
@@ -53,6 +61,8 @@ class Player extends Entity {
 
   constructor() {
     super();
+    G.player = this;
+
     this.pos = new Vector2(Math.random() * 280, Math.random() * 200);
 
     this.addTags('player');
@@ -72,23 +82,28 @@ class Player extends Entity {
 
     super.update();
   }
+
+  destroy() {
+    super.destroy();
+    G.player = null;
+  }
 }
 
 
 
 class Attack extends GameObject{
   ownerGameObject = null;
-  
+
   attackedEnemysCount = 1;
   maxLifeFrame = 1;
   damage = new MinMax(1, 1);
-  
+
   attackTags = [];
-  
+
   constructor(ownerGameObject) {
     if (ownerGameObject == null) console.error('攻撃のオーナーが指定されていません');
     this.ownerGameObject = ownerGameObject;
   }
-  
-  
+
+
 }
