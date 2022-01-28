@@ -97,7 +97,7 @@ class Collider extends Component {
 
   overColliders(maskTags) {
     let maskedCols = Collider.colliders.filter(v => v.gameObject.containsTags(maskTags));
-    return maskedCols.filter(v => this.isCollision(v)).sort((a,b)=>{return Vector2.distance(this.gameObject.pos + this.pos, a.gameObject.pos + a.pos) - Vector2.distance(this.gameObject.pos + this.pos, b.gameObject.pos + b.pos)});
+    return maskedCols.filter(v => this.isCollision(v)).sort((a,b)=>{return Vector2.distance(this.gameObject.pos + this.pos, b.gameObject.pos + b.pos) - Vector2.distance(this.gameObject.pos + this.pos, a.gameObject.pos + a.pos)});
   }
 
   moveOnCollision(other) {}

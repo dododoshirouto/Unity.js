@@ -2,6 +2,8 @@ class Entity extends GameObject {
 
   hp = 100;
   maxHp = 100;
+  hpbar = null;
+
   attack = 0;
   atkRange = null;
   moveRange = 0;
@@ -16,16 +18,16 @@ class Entity extends GameObject {
   constructor() {
     super();
     this.addTags('entity');
-    
-    new HPBar(this);
+
+    this.hpbar = new HPBar(this);
 
     this.size = new Vector2(60, 60);
 
     this.addComponent(new RectRenderer(this));
-    this.components.RectRenderer.size = this.size;
+    this.components.RectRenderer.size = this.size.clone();
 
     this.addComponent(new RectCollider(this));
-    this.components.RectCollider.size = this.size;
+    this.components.RectCollider.size = this.size.clone();
 
     this.addComponent(new Rigidbody(this));
     this.components.Rigidbody.collisionableTags = ['ground'];
@@ -41,6 +43,11 @@ class Entity extends GameObject {
     if (this.hp == 0) {
       this.destroy();
     }
+  }
+
+  destroy() {
+    this.hpbar.destroy();
+    super.destroy();
   }
 }
 
@@ -162,33 +169,32 @@ class Attack extends GameObject{
 
 class HPBar extends GameObject{
   ownerGameObject = null;
-  
+
   constructor(ownerGameObject) {
     super();
     this.ownerGameObject = ownerGameObject;
     this.addTags('hpbar');
     this.index = 10000;
-    this.size = new Vector2(200, 30);
-    
+    this.size = new Vector2(100, 10);
+
     this.addComponent(new RectRenderer(this), 'bg');
     this.addComponent(new RectRenderer(this), 'fill');
-    
-    this.components.bg.size = this.size;
-    this.components.fill.size = this.size;
+
+    this.components.bg.size = this.size.clone();
+    this.components.fill.size = this.size.clone();
     this.components.bg.fill = '#8006';
     this.components.fill.fill = '#0806';
     this.components.bg.stroke = 'transparent';
     this.components.fill.stroke = 'transparent';
   }
-  
+
   draw() {
-    // this.pos = Vector2.add(this.ownerGameObject.pos, new Vector2(0, -this.ownerGameObject.size.y/2- 50));
-    this.pos = this.ownerGameObject.pos.clone();
-    this.pos.y -= 150;
-    
-    this.components.fill.size.x = this.components.bg.size.x * this.hp / this.maxHp;
+    this.pos = Vector2.add(this.ownerGameObject.pos, new Vector2(0, -this.ownerGameObject.size.y/2- 20));
+    // this.pos = this.ownerGameObject.pos.clone();
+
+    this.components.fill.size.x = this.components.bg.size.x * this.ownerGameObject.hp / this.ownerGameObject.maxHp;
     this.components.fill.pos.x = -(this.components.bg.size.x - this.components.fill.size.x) / 2;
-    
+
     super.draw();
   }
 }
