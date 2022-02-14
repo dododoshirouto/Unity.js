@@ -2,6 +2,8 @@ class GObject {
   pos = Vector2.zero;
   size = Vector2.zero;
   index = 0;
+  
+  tags = [];
 
   constructor() {
 
@@ -18,12 +20,22 @@ class GObject {
   destroy() {
 
   }
+  
+  addTags(tags) {
+    if (typeof tags == 'string') tags = [tags];
+    this.tags = this.tags.concat(tags);
+    this.tags = Array.from(new Set(this.tags));
+  }
+  containsTags(tags) {
+    if (typeof tags == 'string') tags = [tags];
+    tags = Array.from(new Set(tags));
+    let res = this.tags.filter(v=>tags.indexOf(v)>-1);
+    return res.length == tags.length;
+  }
 }
 
 class GameObject extends GObject {
   static gameObjects = [];
-
-  tags = [];
 
   name = "Game Object";
   components = {};
@@ -46,18 +58,6 @@ class GameObject extends GObject {
     for (const key in this.components) {
       this.components[key].draw();
     }
-  }
-
-  addTags(tags) {
-    if (typeof tags == 'string') tags = [tags];
-    this.tags = this.tags.concat(tags);
-    this.tags = Array.from(new Set(this.tags));
-  }
-  containsTags(tags) {
-    if (typeof tags == 'string') tags = [tags];
-    tags = Array.from(new Set(tags));
-    let res = this.tags.filter(v=>tags.indexOf(v)>-1);
-    return res.length == tags.length;
   }
 
   destroy() {
@@ -83,20 +83,28 @@ class Component extends GObject {
     }
     delete this.gameObject.components.name;
   }
+  
+  containsTags(tags) {
+    if (typeof tags == 'string') tags = [tags];
+    tags = Array.from(new Set(tags));
+    let res = this.tags.concat(this.gameObject.tags).filter(v=>tags.indexOf(v)>-1);
+    return (res.length == tags.length);
+  }
 }
 
 class Collider extends Component {
   static colliders = [];
   isTrigger = false;
+  tags = [];
   constructor(gameObject) {
     super(gameObject);
     Collider.colliders.push(this);
-  }
+}
 
   isCollision(other) { return false; }
 
   overColliders(maskTags) {
-    let maskedCols = Collider.colliders.filter(v => v.gameObject.containsTags(maskTags));
+    let maskedCols = Collider.colliders.filter(v => v.containsTags(maskTags));
     return maskedCols.filter(v => this.isCollision(v)).sort((a,b)=>{return Vector2.distance(this.gameObject.pos + this.pos, b.gameObject.pos + b.pos) - Vector2.distance(this.gameObject.pos + this.pos, a.gameObject.pos + a.pos)});
   }
 

@@ -3,16 +3,16 @@ class Entity extends GameObject {
   hp = 100;
   maxHp = 100;
   hpbar = null;
-
-  attack = 0;
+  
   atkRange = null;
-  moveRange = 0;
+  moveRange = null;
   defence = 0;
 
   moveTarget = null;
   atkTarget = null;
 
-  atkRange = new MinMax(30, 30);
+  attackTags = [];
+  atkRange = new MinMax(20, 20);
   atkAge = 0;
 
   constructor() {
@@ -21,21 +21,32 @@ class Entity extends GameObject {
 
     this.hpbar = new HPBar(this);
 
-    this.size = new Vector2(60, 60);
+    this.size = new Vector2(30, 30);
 
     this.addComponent(new RectRenderer(this));
     this.components.RectRenderer.size = this.size.clone();
 
     this.addComponent(new RectCollider(this));
     this.components.RectCollider.size = this.size.clone();
+    this.components.RectCollider.addTags('bodyCol');
+
 
     this.addComponent(new Rigidbody(this));
     this.components.Rigidbody.collisionableTags = ['ground'];
+    
+    this.addComponent(new RangeCollider(this), 'atkRange');
+    this.components.atkRange.range = 50;
+    this.components.atkRange.addTags('atkRange');
+    
+    this.addComponent(new RangeCollider(this), 'moveRange');
+    this.components.moveRange.range = 300;
+    this.components.moveRange.addTags('moveRange');
   }
 
   update() {
     super.update();
     this.atkAge--;
+    this.attack();
   }
 
   damage(damage) {
@@ -44,10 +55,26 @@ class Entity extends GameObject {
       this.destroy();
     }
   }
+  
+  attack() {
+    if (this.atkAge <= 0) {
+      let attakableEnemys = this.components.atkRange.overColliders(this.attackTags);
+      if (attakableEnemys.length > 0) {
+        let atk = new Attack(this);
+        atk.attackTags = this.attackTags;
+        atk.pos = attakableEnemys[0].gameObject.pos;
+        this.atkAge = this.atkRange.random();
+      }
+    }
+  }
 
   destroy() {
     this.hpbar.destroy();
     super.destroy();
+  }
+  
+  automove() {
+    
   }
 }
 
@@ -67,6 +94,8 @@ class Enemy extends Entity {
 
     this.components.RectRenderer.fill = ['darkblue', 'darkgoldenrod', 'darkred', 'darkcyan', 'darkmagenta'][Math.floor(Math.random() * 5)];
     this.components.RectRenderer.stroke = "red";
+    
+    this.attackTags = ['player','bodyCol'];
   }
 
   destroy() {
@@ -95,27 +124,15 @@ class Player extends Entity {
     this.components.RectRenderer.fill = "darkgreen";
     this.components.RectRenderer.stroke = "blue";
     this.index = 500;
-
-    this.addComponent(new RangeCollider(this), 'atkRange');
-    this.components.atkRange.range = 100;
+    
+    this.attackTags = ['enemy', 'bodyCol'];
   }
 
   update() {
     super.update();
 
     this.components.Rigidbody.vel.x = G.directionInput.x * 200;
-
     if ((G.pressedKeys.Space || G.touchCount >= 2) && this.components.Rigidbody.isCollision) this.components.Rigidbody.addForce(0, -1000);
-
-    if (this.atkAge <= 0) {
-      let attakableEnemys = this.components.atkRange.overColliders(['enemy']);
-      if (attakableEnemys.length > 0) {
-        let atk = new Attack(this);
-        atk.attackTags = ['enemy'];
-        atk.pos = attakableEnemys[0].gameObject.pos;
-        this.atkAge = this.atkRange.random();
-      }
-    }
   }
 
   destroy() {
@@ -154,6 +171,7 @@ class Attack extends GameObject{
   update() {
     let overColliders = this.components.RangeCollider.overColliders(this.attackTags);
     for (const col of overColliders) {
+      if (!col.gameObject.damage) continue;
       col.gameObject.damage(this.damage.random());
       this.attackCount++;
       if (this.attackCount >= this,this.attackedEnemysCount) break;
