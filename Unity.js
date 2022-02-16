@@ -223,7 +223,7 @@ class Rigidbody extends Component {
   useGravity = true;
   collisionableTags = [];
 
-  drag = 0.94;
+  drag = 0.85;
 
   isCollision = false;
 

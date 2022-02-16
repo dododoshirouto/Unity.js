@@ -1,18 +1,20 @@
 class Entity extends GameObject {
 
-  hp = 100;
+  hp = 0;
   maxHp = 100;
   hpbar = null;
-  
-  atkRange = null;
-  moveRange = null;
+
+  atk = new MinMax(2, 5);
+  atkRange = 50;
+  moveRange = 200;
   defence = 0;
 
   moveTarget = null;
+  moveSpeedX = 50;
   atkTarget = null;
 
   attackTags = [];
-  atkRange = new MinMax(20, 20);
+  atkAgeRange = new MinMax(20, 30);
   atkAge = 0;
 
   constructor() {
@@ -33,18 +35,23 @@ class Entity extends GameObject {
 
     this.addComponent(new Rigidbody(this));
     this.components.Rigidbody.collisionableTags = ['ground'];
-    
+
     this.addComponent(new RangeCollider(this), 'atkRange');
-    this.components.atkRange.range = 50;
+    this.components.atkRange.range = this.atkRange;
     this.components.atkRange.addTags('atkRange');
-    
+
     this.addComponent(new RangeCollider(this), 'moveRange');
-    this.components.moveRange.range = 300;
+    this.components.moveRange.range = this.moveRange;
     this.components.moveRange.addTags('moveRange');
+    
+    this.hp = this.maxHp;
   }
 
   update() {
     super.update();
+
+    this.automove();
+
     this.atkAge--;
     this.attack();
   }
@@ -55,7 +62,7 @@ class Entity extends GameObject {
       this.destroy();
     }
   }
-  
+
   attack() {
     if (this.atkAge <= 0) {
       let attakableEnemys = this.components.atkRange.overColliders(this.attackTags);
@@ -63,7 +70,8 @@ class Entity extends GameObject {
         let atk = new Attack(this);
         atk.attackTags = this.attackTags;
         atk.pos = attakableEnemys[0].gameObject.pos;
-        this.atkAge = this.atkRange.random();
+        atk.damage = this.atk;
+        this.atkAge = this.atkAgeRange.random();
       }
     }
   }
@@ -72,9 +80,14 @@ class Entity extends GameObject {
     this.hpbar.destroy();
     super.destroy();
   }
-  
+
   automove() {
-    
+    if (!this.components.Rigidbody || !this.components.Rigidbody.isCollision) return;
+    if (this.components.atkRange.overColliders(this.attackTags).length > 0) return;
+    let targetEnemys = this.components.moveRange.overColliders(this.attackTags);
+    if (targetEnemys.length > 0) {
+      this.components.Rigidbody.vel.x = Math.sign(targetEnemys[0].gameObject.pos.x - this.pos.x) * this.moveSpeedX;
+    }
   }
 }
 
@@ -88,19 +101,19 @@ class Enemy extends Entity {
     if (!G.enemy) G.enemy = [];
     G.enemy.push(this);
 
-    this.pos = new Vector2(Math.random() * 1000+280, Math.random() * 200);
+    this.pos = new Vector2(Math.random() * 1000 + 280, Math.random() * 200);
 
     this.addTags('enemy');
 
     this.components.RectRenderer.fill = ['darkblue', 'darkgoldenrod', 'darkred', 'darkcyan', 'darkmagenta'][Math.floor(Math.random() * 5)];
     this.components.RectRenderer.stroke = "red";
-    
-    this.attackTags = ['player','bodyCol'];
+
+    this.attackTags = ['player', 'bodyCol'];
   }
 
   destroy() {
     super.destroy();
-    G.enemy = G.enemy.filter(v=>v!=this);
+    G.enemy = G.enemy.filter(v => v != this);
   }
 }
 
@@ -108,9 +121,10 @@ class Enemy extends Entity {
 
 class Player extends Entity {
 
-  moveSpeedX = 300;
+  moveSpeedX = 100;
+  moveRange = 500;
+  
   jumpPower = 1000;
-
   isJumpping = false;
 
   constructor() {
@@ -124,15 +138,18 @@ class Player extends Entity {
     this.components.RectRenderer.fill = "darkgreen";
     this.components.RectRenderer.stroke = "blue";
     this.index = 500;
-    
+
     this.attackTags = ['enemy', 'bodyCol'];
+    
+    this.hp = this.maxHp = 500;
+    this.components.moveRange.range = 500;
   }
 
   update() {
     super.update();
 
-    this.components.Rigidbody.vel.x = G.directionInput.x * 200;
-    if ((G.pressedKeys.Space || G.touchCount >= 2) && this.components.Rigidbody.isCollision) this.components.Rigidbody.addForce(0, -1000);
+    // this.components.Rigidbody.vel.x = G.directionInput.x * this.moveSpeedX;
+    // if ((G.pressedKeys.Space || G.touchCount >= 2) && this.components.Rigidbody.isCollision) this.components.Rigidbody.addForce(0, -1000);
   }
 
   destroy() {
@@ -143,11 +160,11 @@ class Player extends Entity {
 
 
 
-class Attack extends GameObject{
+class Attack extends GameObject {
   ownerGameObject = null;
 
   attackedEnemysCount = 1;
-  maxLifeFrame = 1;
+  maxLifeFrame = 5;
   damage = new MinMax(10, 10);
 
   lifeFrame = 0;
@@ -171,10 +188,10 @@ class Attack extends GameObject{
   update() {
     let overColliders = this.components.RangeCollider.overColliders(this.attackTags);
     for (const col of overColliders) {
+      if (this.attackCount >= this.attackedEnemysCount) break;
       if (!col.gameObject.damage) continue;
       col.gameObject.damage(this.damage.random());
       this.attackCount++;
-      if (this.attackCount >= this,this.attackedEnemysCount) break;
     }
     this.lifeFrame++;
     if (this.lifeFrame >= this.maxLifeFrame) this.destroy();
@@ -185,7 +202,7 @@ class Attack extends GameObject{
 
 
 
-class HPBar extends GameObject{
+class HPBar extends GameObject {
   ownerGameObject = null;
 
   constructor(ownerGameObject) {
@@ -207,7 +224,7 @@ class HPBar extends GameObject{
   }
 
   draw() {
-    this.pos = Vector2.add(this.ownerGameObject.pos, new Vector2(0, -this.ownerGameObject.size.y/2- 20));
+    this.pos = Vector2.add(this.ownerGameObject.pos, new Vector2(0, -this.ownerGameObject.size.y / 2 - 20));
     // this.pos = this.ownerGameObject.pos.clone();
 
     this.components.fill.size.x = this.components.bg.size.x * this.ownerGameObject.hp / this.ownerGameObject.maxHp;
