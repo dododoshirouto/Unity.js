@@ -223,7 +223,8 @@ class Rigidbody extends Component {
   useGravity = true;
   collisionableTags = [];
 
-  drag = 0.85;
+  onCollisionDrag = 0.65;
+  inAirDrag = 0.96;
 
   isCollision = false;
 
@@ -243,7 +244,7 @@ class Rigidbody extends Component {
       overColliders.map(v => this.gameObject.components.RectCollider.moveOnCollision(v));
     }
 
-    this.vel.mul(this.drag);
+    this.vel.mul(this.isCollision? this.onCollisionDrag: this.inAirDrag);
     if (Math.abs(this.vel.x) < 1) this.vel.x = 0;
     if (Math.abs(this.vel.y) < 1) this.vel.y = 0;
   }
