@@ -2,7 +2,7 @@ class GObject {
   pos = Vector2.zero;
   size = Vector2.zero;
   index = 0;
-  
+
   tags = [];
 
   constructor() {
@@ -20,7 +20,7 @@ class GObject {
   destroy() {
 
   }
-  
+
   addTags(tags) {
     if (typeof tags == 'string') tags = [tags];
     this.tags = this.tags.concat(tags);
@@ -83,7 +83,7 @@ class Component extends GObject {
     }
     delete this.gameObject.components.name;
   }
-  
+
   containsTags(tags) {
     if (typeof tags == 'string') tags = [tags];
     tags = Array.from(new Set(tags));
@@ -309,25 +309,48 @@ class RangeRenderer extends Renderer {
 }
 
 class Scene {
-  gameObjects = [];
-  
+  static scenes = {};
+
+  gameObjects = {};
+
   constructor() {
-    
+    this.setup();
   }
-  
+
   setup() {
-    
+
   }
-  
+
   update() {
-    
+
   }
-  
+
   draw() {
-    
+
   }
-  
+
   destroy() {
-    
+
+  }
+}
+
+class ImageLoader {
+  static images = {};
+
+  image = null;
+  loaded = false;
+
+  tiling = true;
+  tileX = 1;
+  tileY = 1;
+
+  constructor(name, url=name) {
+    ImageLoader.images[name] = this;
+    this.image = new Image();
+    this.image.src = src;
+  }
+
+  update() {
+
   }
 }
