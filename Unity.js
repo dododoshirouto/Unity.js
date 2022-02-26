@@ -354,3 +354,7 @@ class ImageLoader {
 
   }
 }
+
+class ImageRenderer extends RectRenderer {
+
+}
