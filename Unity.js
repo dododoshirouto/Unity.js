@@ -308,8 +308,26 @@ class RangeRenderer extends Renderer {
   }
 }
 
-class Camera extends Component {
-  constructor(gameObject) {
-    super(gameObject);
+class Scene {
+  gameObjects = [];
+  
+  constructor() {
+    
+  }
+  
+  setup() {
+    
+  }
+  
+  update() {
+    
+  }
+  
+  draw() {
+    
+  }
+  
+  destroy() {
+    
   }
 }
